@@ -72,9 +72,9 @@ def compute_loss(model, x):
 
 
 #@tf.function
-def train_step(model, x, optimizer):
+def train_step(model, x, details , optimizer):
   with tf.GradientTape() as tape:
-    loss = compute_loss(model, x)
+    loss = compute_loss(model, x  )
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
@@ -92,7 +92,7 @@ def generate_and_save_images(model, epoch, test_sample):
 
   for i in range(predictions.shape[0]):
       plt.subplot(4, 4, i + 1)
-      plt.imshow(predictions[i, :, :, 0], cmap='gray')
+      plt.imshow(predictions[i, :, :, 0])
       plt.axis('off')
 
   # tight_layout minimizes the overlap between 2 sub-plots

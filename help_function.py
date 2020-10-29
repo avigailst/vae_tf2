@@ -44,7 +44,7 @@ class help_function:
                 new_data.append(np.array(img[1]))
             except:
                 continue
-            return  self.split_train_test(new_data, new_details)
+        return  self.split_train_test(new_data, new_details)
 
 
 
