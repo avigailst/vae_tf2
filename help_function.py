@@ -19,6 +19,8 @@ class help_function:
         files_name = os.path.join(folder_path, image_type)
         # glob goes through all files in dir
         images_name = [file_path for file_path in glob.iglob(files_name)] # List of files name
+        random.seed(2019)
+        random.shuffle(images_name)
         image_pixel =  np.array([cv2.cvtColor(cv2.imread(file_path, 1),cv2.COLOR_BGR2RGB)for file_path in images_name])
         data = [[file_path,image_pixel[i]] for (i,file_path) in enumerate(images_name)] # List of pixels # Write "mpimg.imread(file_path)[:,:,0]" for one color
         return self.extract_data(data)
