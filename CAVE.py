@@ -11,9 +11,14 @@ class CVAE(tf.keras.Model):
         [
             tf.keras.layers.InputLayer(input_shape=(56, 56, 3)),
             tf.keras.layers.Conv2D(
-                filters=64, kernel_size=3, strides=(2, 2), activation='relu'),
+                filters=64, kernel_size=4, strides=(2, 2), activation='relu', padding='same'),
+            tf.keras.layers.Dropout(.5),
+            tf.keras.layers.MaxPooling2D(pool_size=2, strides=1, padding='same'),
             tf.keras.layers.Conv2D(
-                filters=64, kernel_size=3, strides=(2, 2), activation='relu'),
+                filters=64, kernel_size=4, strides=(2, 2), activation='relu', padding='same'),
+            tf.keras.layers.Dropout(.5),
+            tf.keras.layers.Conv2D(filters=64, kernel_size=4, strides=(1, 1), activation='relu', padding='same'),
+            tf.keras.layers.Dropout(.5),
             tf.keras.layers.Flatten(),
             # No activation
             tf.keras.layers.Dense(latent_dim + latent_dim),
@@ -26,14 +31,17 @@ class CVAE(tf.keras.Model):
             tf.keras.layers.Dense(units=14*14*32, activation=tf.nn.relu),
             tf.keras.layers.Reshape(target_shape=(14, 14, 32)),
             tf.keras.layers.Conv2DTranspose(
-                filters=64, kernel_size=3, strides=2, padding='same',
+                filters=64, kernel_size=4, strides=2, padding='same',
                 activation='relu'),
+            tf.keras.layers.Dropout(.5),
             tf.keras.layers.Conv2DTranspose(
-                filters=32, kernel_size=3, strides=2, padding='same',
+                filters=64, kernel_size=4, strides=2, padding='same',
                 activation='relu'),
-            # No activation
+            tf.keras.layers.Dropout(.5),
             tf.keras.layers.Conv2DTranspose(
-                filters=3, kernel_size=3, strides=1, padding='same'),
+                filters=3, kernel_size=2, strides=1, padding='same',
+                activation='relu'),
+
         ]
     )
 
