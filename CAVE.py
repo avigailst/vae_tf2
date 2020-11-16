@@ -3,9 +3,10 @@ import tensorflow as tf
 class CVAE(tf.keras.Model):
   """Convolutional variational autoencoder."""
 
-  def __init__(self, latent_dim):
+  def __init__(self, latent_dim,details_dim):
     super(CVAE, self).__init__()
     self.latent_dim = latent_dim
+    self.details_dim = details_dim
     self.encoder = tf.keras.Sequential(
         [
             tf.keras.layers.InputLayer(input_shape=(56, 56, 3)),
@@ -21,7 +22,7 @@ class CVAE(tf.keras.Model):
 
     self.decoder = tf.keras.Sequential(
         [
-            tf.keras.layers.InputLayer(input_shape=(latent_dim,)),
+            tf.keras.layers.InputLayer(input_shape=(latent_dim + details_dim,)),
             tf.keras.layers.Dense(units=14*14*32, activation=tf.nn.relu),
             tf.keras.layers.Reshape(target_shape=(14, 14, 32)),
             tf.keras.layers.Conv2DTranspose(
@@ -36,11 +37,11 @@ class CVAE(tf.keras.Model):
         ]
     )
 
-  @tf.function
-  def sample(self, eps=None):
+ # @tf.function
+  def sample(self, eps=None, details=None):
     if eps is None:
       eps = tf.random.normal(shape=(100, self.latent_dim))
-    return self.decode(eps, apply_sigmoid=True)
+    return self.decode(eps, details, apply_sigmoid=True)
 
   def encode(self, x):
     mean, logvar = tf.split(self.encoder(x), num_or_size_splits=2, axis=1)
@@ -50,8 +51,8 @@ class CVAE(tf.keras.Model):
     eps = tf.random.normal(shape=mean.shape)
     return eps * tf.exp(logvar * .5) + mean
 
-  def decode(self, z, apply_sigmoid=False):
-    logits = self.decoder(z)
+  def decode(self, z,details,  apply_sigmoid=False):
+    logits = self.decoder(tf.concat([z, tf.cast(details,'float32')], 1))
     if apply_sigmoid:
       probs = tf.sigmoid(logits)
       return probs
