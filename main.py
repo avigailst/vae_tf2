@@ -17,7 +17,7 @@ width_global=56
 image_folder = './Images'
 image_type = '*.jpg'
 batch_size = 100
-epochs = 20
+epochs = 30
 # set the dimensionality of the latent space to a plane for visualization later
 latent_dim = 100
 details_dim = 7
@@ -87,7 +87,7 @@ def train_step(model, x, details , optimizer):
 # it will be easier to see the improvement.
 random_vector_for_generation = tf.random.normal(shape=[num_examples_to_generate, latent_dim])
 model = cv.CVAE(latent_dim, details_dim)
-#model.load_weights('./save_model')
+
 def generate_and_save_images(model, epoch, test_sample, details, old_details):
   mean, logvar = model.encode(test_sample)
   z = model.reparameterize(mean, logvar)
@@ -129,20 +129,12 @@ for test_batch_details in test_details_dataset.take(1):
 checkpoint_path = "training_2/cp-{epoch:04d}.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
-batch_size = 32
-
-# Create a callback that saves the model's weights every 5 epochs
-cp_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=checkpoint_path,
-    verbose=1,
-    save_weights_only=True,
-    save_freq=5)
-model.save_weights(checkpoint_path.format(epoch=0))
+batch_size = 100
 
 
 latest = tf.train.latest_checkpoint(checkpoint_dir)
 
-model.load_weights(latest)
+#model.load_weights(latest)
 
 
 for epoch in range(1, epochs + 1):
@@ -166,9 +158,10 @@ for epoch in range(1, epochs + 1):
     elbo = -loss.result()
     print("epoch: " + str(epoch) + " loss: " + str(loss.result()))
 
-    # Include the epoch in the file name (uses `str.format`)
+    model.save_weights(checkpoint_path.format(epoch=0))
 
-    # model.save('/tmp/model')
+
+
 
 test_itere =  iter(test_details_dataset)
 for test_x in test_dataset:

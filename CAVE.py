@@ -49,7 +49,7 @@ class CVAE(tf.keras.Model):
   def sample(self, eps=None, details=None):
     if eps is None:
       eps = tf.random.normal(shape=(100, self.latent_dim))
-    return self.decode(eps, details, apply_sigmoid=True)
+    return self.decode(eps, details)
 
   def encode(self, x):
     mean, logvar = tf.split(self.encoder(x), num_or_size_splits=2, axis=1)
@@ -59,8 +59,9 @@ class CVAE(tf.keras.Model):
     eps = tf.random.normal(shape=mean.shape)
     return eps * tf.exp(logvar * .5) + mean
 
-  def decode(self, z,details,  apply_sigmoid=False):
+  def decode(self, z,details,  apply_sigmoid=True):
     logits = self.decoder(tf.concat([z, tf.cast(details,'float32')], 1))
+ #   logits = tf.types.cast(logits,tf.float64)
     if apply_sigmoid:
       probs = tf.sigmoid(logits)
       return probs
