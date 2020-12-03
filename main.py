@@ -23,14 +23,15 @@ batch_size = 100
 # test_size = 10000
 latent_dim = 200
 num_examples_to_generate = 25
-epochs = 1
+epochs = 5
 image_folder = './Images'
 image_type = '*.jpg'
 per_distribution = 0.9
 heigh_global=56
 width_global=56
 details_dim = 7
-to_load = True
+to_load = False
+learning_rate = 1e-4
 
 (train_data, validation_data, test_data, train_details, validation_details, test_details) = hf.get_data(image_folder, image_type, per_distribution)
 
@@ -56,7 +57,7 @@ validation_details_dataset = (tf.data.Dataset.from_tensor_slices(validation_deta
 test_details_dataset = (tf.data.Dataset.from_tensor_slices(test_details)
                 .batch(batch_size))
 
-optimizer = tf.keras.optimizers.Adam(1e-4)
+optimizer = tf.keras.optimizers.Adam(learning_rate)
 
 
 checkpoint_path = "training_2/cp-{epoch:04d}.ckpt"

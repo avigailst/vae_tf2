@@ -13,11 +13,12 @@ class loss_function:
 
 
     def compute_loss(self,model, x, details):
-      mean, logvar = model.encode(x, True)
+      mean, logvar = model.encode(x, False)
       z = model.reparameterize(mean, logvar)
       x_logit = model.decode(z, details)
       cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=x_logit, labels=x)
-      logpx_z = -tf.reduce_sum(cross_ent, axis=[1, 2, 3])
+      #z_diff = tf.pow(x_logit - x,2)
+      logpx_z = tf.reduce_sum(cross_ent, axis=[1, 2, 3])
       logpz = self.log_normal_pdf(z, 0., 0.)
       logqz_x = self.log_normal_pdf(z, mean, logvar)
-      return -tf.reduce_mean(logpx_z + logpz)# - logqz_x)
+      return tf.reduce_mean(logpx_z) # + logpz)# - logqz_x)
